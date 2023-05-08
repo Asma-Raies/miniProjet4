@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+ layout:decorator="template">
+
+<link rel="stylesheet" type="text/css" href="webjars/bootstrap/4.3.1/css/bootstrap.min.css" />
+<head>
+    <meta charset="utf-8">
+    <title>Liste des Produits</title>
+</head>
+<body>
+<div th:replace="template"></div>
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-header">
+                Liste des Produits
+            </div>
+            <div class="card-body">
+
+                <table class="table table-striped">
+ <tr>
+ <th>reference</th><th>Nom MakeUp</th><th>Prix</th><th>quantite</th><th>date de creation </th><th>marque</th>
+ </tr> 
+ 
+ <tr th:each="p:${makeUp.content}">
+
+ <tr th:each="p:${makeUp}">
+ <td th:text="${p.refMakeUp}"></td>
+ <td th:text="${p.nomMakeUp}"></td>
+ <td th:text="${p.prixMakeUp}"></td> 
+  <td th:text="${p.quantite}"></td> 
+  <td th:text="${#dates.format(p.dateCreation, 'dd/MM/yyyy')}"></td>
+  
+     <td   th:if= "${!#strings.isEmpty(p.marque)}"   th:text="${p.marque.nomMarq}"></td>  
+              <td   th:if= "${#strings.isEmpty(p.marque)}"     th:text="${'Pas de marque'}"></td> 
+               	
+  <td sec:authorize="hasRole('ADMIN')"><a class="btn btn-primary"   th:href="@{modifierMakeUp(id=${p.refMakeUp},page=${currentPage})}">Edit</a></td>
+  <td sec:authorize="hasRole('ADMIN')"><a class="btn btn-danger"   onclick=" confirm('Etes-vous sûr ?')" th:href="@{supprimerMakeUp(id=${p.refMakeUp}, 
+page=${currentPage},size=${size})}">Supprimer</a></td>
+
+  </tr> 
+ </tr> 
+ </table>
+ <ul class="nav nav-pills">
+ <li th:each="page,status:${pages}">
+ <a th:class="${status.index==currentPage?'btn btn-primary':'btn' }"
+ th:href="@{ ListeMakeUp(page=${status.index}, size=${size} ) }"
+ th:text="${status.index }"></a>
+ </li>
+ </ul>
+ </div>
+</div>
+</div>
+</body>
+</html>
