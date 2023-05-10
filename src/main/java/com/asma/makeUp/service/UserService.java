@@ -17,35 +17,12 @@ import lombok.RequiredArgsConstructor;
 
 
 
-@Service
-@RequiredArgsConstructor
-public class UserService {
 
-    private final RoleRepository roleRepository;
-    private final UserRepository userRepository;
-    private final PasswordEncoder encoder;
-    @Transactional
-    public void save(User user) {
+public interface UserService {
+	User saveUser(User user);
+	User findUserByUsername (String username);
+	Role addRole(Role role);
+	User addRoleToUser(String username, String rolename);
 
-
-        var userRole = roleRepository.findByRole(RoleType.ROLE_ADMIN.name())
-                .orElse(
-                
-                        Role.builder()
-                                .role(RoleType.ROLE_ADMIN.name())
-                                .build()
-                );
-       
-        if (userRole.getUsers() == null) {
-            userRole = roleRepository.save(userRole);
-        }
-        var defaultUserRole = List.of(userRole);
-        user.setRoles(defaultUserRole);
-        var savedUser = userRepository.save(user);
-        savedUser.setPassword(encoder.encode(savedUser.getPassword()));
-        userRole.setUsers(new ArrayList<>(List.of(savedUser)));
-        roleRepository.save(userRole);
-
-    }
 
 }

@@ -28,7 +28,7 @@ src="webjars/bootstrap/4.3.1/js/bootstrap.min.js"></script>
  makeUp
  </a>
  <div class="dropdown-menu">
- <a  sec:authorize="hasRole('ADMIN')"  class="dropdown-item" th:href="@{showCreate}">Ajouter</a>
+ <a  sec:authorize="hasAuthority('ADMIN')"   class="dropdown-item" th:href="@{showCreate}">Ajouter</a>
  <a class="dropdown-item" th:href="@{ListeMakeUp}">Lister</a>
  </div>
  </li>

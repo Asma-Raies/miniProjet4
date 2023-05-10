@@ -34,8 +34,8 @@
      <td   th:if= "${!#strings.isEmpty(p.marque)}"   th:text="${p.marque.nomMarq}"></td>  
               <td   th:if= "${#strings.isEmpty(p.marque)}"     th:text="${'Pas de marque'}"></td> 
                	
-  <td sec:authorize="hasRole('ADMIN')"><a class="btn btn-primary"   th:href="@{modifierMakeUp(id=${p.refMakeUp},page=${currentPage})}">Edit</a></td>
-  <td sec:authorize="hasRole('ADMIN')"><a class="btn btn-danger"   onclick=" confirm('Etes-vous sûr ?')" th:href="@{supprimerMakeUp(id=${p.refMakeUp}, 
+  <td sec:authorize="hasAuthority('ADMIN')" ><a class="btn btn-primary"   th:href="@{modifierMakeUp(id=${p.refMakeUp},page=${currentPage})}">Edit</a></td>
+  <td sec:authorize="hasAuthority('ADMIN')" ><a class="btn btn-danger"   onclick=" confirm('Etes-vous sûr ?')" th:href="@{supprimerMakeUp(id=${p.refMakeUp}, 
 page=${currentPage},size=${size})}">Supprimer</a></td>
 
   </tr> 

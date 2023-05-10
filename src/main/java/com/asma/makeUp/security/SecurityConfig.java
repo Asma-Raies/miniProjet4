@@ -1,74 +1,106 @@
 package com.asma.makeUp.security;
 
 
-import org.springframework.beans.factory.annotation.Autowired;
 
 
-
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-
-import org.springframework.security.authentication.AuthenticationProvider;
-
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity
-@RequiredArgsConstructor
-public class SecurityConfig {
+public class SecurityConfig  {
+	
+	 @Bean
+	    public PasswordEncoder passwordEncoder() {
+	        return new BCryptPasswordEncoder();
+	    }
+	
 
-    private final AuthenticationProvider authenticationProvider;
-
-    //authentification en memory
-    /*
-    @Bean
-    public InMemoryUserDetailsManager inMemoryUserDetailsManager(PasswordEncoder passwordEncoder) {
-        return new InMemoryUserDetailsManager(
-                User.withUsername("user1").password(passwordEncoder.encode("1234")).roles("USER").build(),
-                User.withUsername("MED AZIZ").password(passwordEncoder.encode("1234")).roles("USER","AGENT").build(),
-                User.withUsername("admin").password(passwordEncoder.encode("1234")).roles("ADMIN").build()
-        );
-    }*/
-
-
-
-
-    //l'utilisation de l'annotation bean au demarage spring va appeler la methode securityFilterChain()
-    @Bean
+	@Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-
-        httpSecurity.formLogin().loginPage("/login").permitAll()
-         .and()
-                .authenticationProvider(authenticationProvider);
-            httpSecurity.authorizeRequests().requestMatchers("/webjars/**").permitAll();
-        httpSecurity.authorizeRequests().requestMatchers("/api/v1/users/**").permitAll();
-        httpSecurity.authorizeRequests().requestMatchers("/showCreate").hasAnyRole("ADMIN");
-        httpSecurity.authorizeRequests().requestMatchers("/saveTelephone").hasAnyRole("ADMIN");
-        httpSecurity.authorizeRequests().requestMatchers("/listeTelephone")
-                .hasAnyRole("ADMIN","USER");
-        httpSecurity.authorizeRequests()
-                .requestMatchers("/supprimerPhone","/modifierPhone","/updatePhone")
-                .hasAnyRole("ADMIN");
-
-        httpSecurity.authorizeRequests().anyRequest().authenticated();
-
-        httpSecurity.exceptionHandling().accessDeniedPage("/accessDenied");
-        httpSecurity.csrf().disable(); // disable CSRF protection
-
+        httpSecurity.csrf().disable()
+                        .authorizeHttpRequests()
+                                .requestMatchers("webjars/**", "/login").permitAll()
+                        .requestMatchers("/showCreate", "/saveMakeUp" ).hasAnyAuthority("ADMIN","AGENT")
+                        .requestMatchers("/ListeMakeUp").hasAnyAuthority("ADMIN","AGENT","USER")
+                        .requestMatchers("/supprimerMakeUp","/modifierMakeUp","/updateMakeUp").hasAuthority("ADMIN")
+                .anyRequest().authenticated().and()
+                                .formLogin(form -> form
+                                        .loginPage("/login")
+                                        .defaultSuccessUrl("/ListeMakeUp", true)
+                                        .loginProcessingUrl("/login")
+                                        .failureUrl("/login?error=true")
+                                        .permitAll()
+                                )
+                .exceptionHandling().accessDeniedPage("/accessDenied");
         return httpSecurity.build();
     }
+	
+	
+
+/*@Override
+protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+	PasswordEncoder	passwordEncoder = passwordEncoder ();
+	
+	auth.userDetailsService(userDetailsService)
+	.passwordEncoder(passwordEncoder);*/
+	
+	
+	
+	/*System.out.println("Password Encoded BCRYPT :******************** ");
+	System.out.println(passwordEncoder.encode("123")); */
+	
+	
+	
+	
+/*	auth.jdbcAuthentication()
+	.dataSource(dataSource)
+	.usersByUsernameQuery("select username , password , enabled from user where username =?")
+	.authoritiesByUsernameQuery(
+	"SELECT u.username, r.role " +
+	"FROM user_role ur, user u , role r " +
+	"WHERE u.user_id = ur.user_id AND ur.role_id = r.role_id AND u.username = ?")
+	.passwordEncoder(passwordEncoder)
+	.rolePrefix("ROLE_"); */
+	
+	
+		
+	/*auth.inMemoryAuthentication().withUser("admin").password(passwordEncoder.encode("123")).roles("ADMIN");
+	auth.inMemoryAuthentication().withUser("nadhem").password(passwordEncoder.encode("123")).roles("AGENT","USER");
+	auth.inMemoryAuthentication().withUser("user1").password(passwordEncoder.encode("123")).roles("USER"); */
+	
+	
+	/*@Override
+	protected void configure(HttpSecurity http) throws Exception {
+		http.authorizeRequests().antMatchers("/showCreate").hasAnyRole("ADMIN","AGENT");
+		
+		http.authorizeRequests().antMatchers("/saveProduit").hasAnyRole("ADMIN","AGENT");
+		
+		http.authorizeRequests().antMatchers("/ListeProduits")
+		.hasAnyRole("ADMIN","AGENT","USER");
+		
+		http.authorizeRequests()
+		.antMatchers("/supprimerProduit","/modifierProduit","/updateProduit")
+		.hasRole("ADMIN");
+		
+		http.authorizeRequests().antMatchers("/login").permitAll();
+		
+		//pour faire fonctionner Bootstrap
+		http.authorizeRequests().antMatchers("/webjars/**").permitAll();
+		
+		//anyRequests() doit être la dernière (pas de antMatchers après anyRequests)
+		http.authorizeRequests().anyRequest().authenticated();
+	
+		http.formLogin().loginPage("/login");	
+		http.exceptionHandling().accessDeniedPage("/accessDenied");
+	} */
+	
+
+	
+	
 }
-
-
-

@@ -1,77 +1,35 @@
 package com.asma.makeUp.entities;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
-
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
-import groovy.transform.builder.Builder;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
+import jakarta.persistence.JoinColumn;
 
-@Entity
 @Data
+@Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "users")
-@Builder
-public class User implements UserDetails {
+@ToString
+public class User {
+@Id
+@GeneratedValue (strategy=GenerationType.IDENTITY)
+private Long user_id;
+private String username;
+private String password;
+private Boolean enabled;
 
-
-    @Id
-    @GeneratedValue
-    private Integer user_id;
-    private String username;
-    private String password;
-    private Boolean enabled;
-    @ManyToMany(fetch = FetchType.EAGER)
-    private List<Role> roles;
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles
-                .stream()
-                .map(r -> new SimpleGrantedAuthority(r.getRole()))
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public String getPassword() {
-        return password;
-    }
-
-    @Override
-    public String getUsername() {
-        return username;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return this.enabled;
-    }
+@ManyToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER)
+@JoinTable(name="user_role",joinColumns = @JoinColumn(name="user_id") ,
+inverseJoinColumns = @JoinColumn(name="role_id"))
+private List<Role> roles;
 }
